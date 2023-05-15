@@ -18,14 +18,14 @@ import {
   Withdrew,
 } from "../generated/schema"
 import {
-  ethereum, Bytes, Wrapped, ByteArray, crypto
+  ethereum, Bytes, Wrapped, ByteArray, BigInt, crypto, BigDecimal
 } from "@graphprotocol/graph-ts";
 
 export function generateLogId(
   transactionHash: Bytes,
-  data: Bytes,
+  logIndex: BigInt,
 ): string {
-  var id = transactionHash.toHex() + data.toHex();
+  var id = transactionHash.toHex() + Bytes.fromBigInt(logIndex).toHex();
   return crypto.keccak256(ByteArray.fromHexString(id)).toHex();
 }
 
@@ -70,7 +70,7 @@ export function createTransactionReceiptEntity(transactionHash: Bytes, receipt: 
 }
 
 export function createLogEntity(transactionHash: Bytes, log: ethereum.Log): void {
-  const entity = new Log(generateLogId(transactionHash, log.data))
+  const entity = new Log(generateLogId(transactionHash, log.logIndex))
   entity.logIndex = log.logIndex
   entity.data = log.data
   entity.topics = log.topics
