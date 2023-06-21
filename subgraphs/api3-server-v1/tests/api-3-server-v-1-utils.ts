@@ -7,7 +7,7 @@ import {
   UpdatedOevProxyBeaconSetWithSignedData,
   UpdatedOevProxyBeaconWithSignedData,
   Withdrew
-} from "../generated/Api3ServerV1/Api3ServerV1"
+} from "../types/Api3ServerV1/Api3ServerV1"
 
 export function createSetDapiNameEvent(
   dataFeedId: Bytes,

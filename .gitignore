@@ -1,3 +1,8 @@
+# auto-generated files
+subgraphs/*/abis
+subgraphs/*/build
+subgraphs/*/types
+
 # TypeScript
 *.tsbuildinfo
 node_modules/

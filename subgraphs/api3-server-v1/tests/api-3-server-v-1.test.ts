@@ -7,8 +7,8 @@ import {
   afterAll
 } from "matchstick-as/assembly/index"
 import { Bytes, Address, BigInt } from "@graphprotocol/graph-ts"
-import { SetDapiName } from "../generated/schema"
-import { SetDapiName as SetDapiNameEvent } from "../generated/Api3ServerV1/Api3ServerV1"
+import { SetDapiName } from "../types/schema"
+import { SetDapiName as SetDapiNameEvent } from "../types/Api3ServerV1/Api3ServerV1"
 import { handleSetDapiName } from "../src/api-3-server-v-1"
 import { createSetDapiNameEvent } from "./api-3-server-v-1-utils"
 
