@@ -12,6 +12,7 @@ dist/
 __pycache__/
 
 # IDE files
+.history/
 .vscode/
 .idea/
 *.sublime-project
