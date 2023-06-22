@@ -8,10 +8,12 @@
     "generate-abis": "solcjs node_modules/@api3/airnode-protocol-v1/contracts/$AIRNODE_CONTRACT_PATH --abi --include-path node_modules/ --base-path . --output-dir subgraphs/$SUBGRAPH_NAME/abis",
     "generate-types": "graph codegen subgraphs/$SUBGRAPH_NAME/src/subgraph.yaml --output-dir subgraphs/$SUBGRAPH_NAME/types",
     "build": "graph build subgraphs/$SUBGRAPH_NAME/src/subgraph.yaml --output-dir subgraphs/$SUBGRAPH_NAME/build",
-    "deploy": "graph deploy $SUBGRAPH_NAME subgraphs/$SUBGRAPH_NAME/src/subgraph.yaml --ipfs $IPFS_NODE --node $GRAPH_NODE --version-label $VERSION_LABEL",
+    "register": "graph create $SUBGRAPH_NAME --node $GRAPH_NODE",
+    "deploy": "graph deploy $SUBGRAPH_NAME subgraphs/$SUBGRAPH_NAME/src/subgraph.yaml --ipfs $IPFS_NODE --node $GRAPH_NODE --version-label $VERSION_LABEL --output-dir subgraphs/$SUBGRAPH_NAME/build",
     "api3-server-v1:generate-abis": "SUBGRAPH_NAME=api3-server-v1 AIRNODE_CONTRACT_PATH=api3-server-v1/Api3ServerV1.sol yarn generate-abis",
     "api3-server-v1:generate-types": "SUBGRAPH_NAME=api3-server-v1 yarn generate-types",
     "api3-server-v1:build": "SUBGRAPH_NAME=api3-server-v1 yarn build",
+    "api3-server-v1:register": "SUBGRAPH_NAME=api3-server-v1 yarn register",
     "api3-server-v1:deploy": "SUBGRAPH_NAME=api3-server-v1 yarn deploy"
   },
   "dependencies": {
