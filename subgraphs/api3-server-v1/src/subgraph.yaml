@@ -22,7 +22,7 @@ dataSources:
         - Withdrew
       abis:
         - name: Api3ServerV1
-          file: ./abis/node_modules_@api3_airnode-protocol-v1_contracts_api3-server-v1_Api3ServerV1_sol_Api3ServerV1.abi
+          file: ../abis/node_modules_@api3_airnode-protocol-v1_contracts_api3-server-v1_Api3ServerV1_sol_Api3ServerV1.abi
       eventHandlers:
         - event: SetDapiName(indexed bytes32,indexed bytes32,address)
           handler: handleSetDapiName
@@ -42,4 +42,4 @@ dataSources:
         - event: Withdrew(indexed address,address,uint256)
           handler: handleWithdrew
           receipt: true
-      file: ./src/api-3-server-v-1.ts
+      file: ./mapping.ts
