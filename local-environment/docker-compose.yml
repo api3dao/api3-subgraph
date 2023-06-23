@@ -1,5 +1,5 @@
 version: "3"
-name: "graph-node"
+name: "graph"
 services:
   graph-node:
     image: graphprotocol/graph-node
@@ -25,13 +25,13 @@ services:
   ipfs-node:
     image: ipfs/go-ipfs:v0.10.0
     ports:
-      - "5001:5001"
+      - "5011:5001"
     volumes:
       - ./data/ipfs:/data/ipfs
   postgres:
     image: postgres
     ports:
-      - "5433:5432"
+      - "5442:5432"
     command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
     environment:
       POSTGRES_USER: graph-node
