@@ -4,11 +4,11 @@ services:
   graph-node:
     image: graphprotocol/graph-node
     ports:
-      - "8000:8000"
-      - "8001:8001"
-      - "8020:8020"
-      - "8030:8030"
-      - "8040:8040"
+      - "${GRAPHQL_HTTP_PORT}:8000" # GraphQL HTTP server
+      - "${GRAPHQL_WEBSOCKET_PORT}:8001" # GraphQL WebSocker server
+      - "${JSON_RPC_PORT}:8020" # JSON-RPC admin server
+      - "${INDEX_PORT}:8030" # index node server
+      - "${METRICS_PORT}:8040" # metrics
     depends_on:
       - ipfs-node
       - postgres
@@ -20,16 +20,16 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: "ipfs-node:5001"
-      ethereum: "mainnet:http://host.docker.internal:${CHAIN_PORT}"
+      ethereum: ${NETWORK_URLS}
       GRAPH_LOG: info
   ipfs-node:
     image: ipfs/go-ipfs:v0.10.0
     ports:
-      - "5011:5001"
+      - "${IPFS_API_PORT}:5001" # IPFS API server
   postgres:
     image: postgres
     ports:
-      - "5442:5432"
+      - "${POSTGRESQL_PORT}:5432" # PostgreSQL server
     command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
     environment:
       POSTGRES_USER: graph-node
