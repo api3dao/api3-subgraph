@@ -126,3 +126,14 @@ type Withdrew @entity(immutable: true) {
   transaction: Transaction!
   transactionReceipt: TransactionReceipt
 }
+
+type Deposit @entity(immutable: true) {
+  id: ID!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+  blockNumber: BigInt!
+  user: Bytes!
+  amount: BigInt!
+  withdrawalLimit: BigInt!
+  sender: Bytes!
+}

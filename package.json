@@ -5,16 +5,17 @@
   "private": true,
   "scripts": {
     "overwrite-subgraph-datasources": "node ./scripts/overwrite-subgraph-datasources.js",
-    "generate-abis": "solcjs node_modules/@api3/airnode-protocol-v1/contracts/$AIRNODE_CONTRACT_PATH --abi --include-path node_modules/ --base-path . --output-dir subgraphs/$SUBGRAPH_NAME/abis",
-    "generate-types": "graph codegen subgraphs/$SUBGRAPH_NAME/src/subgraph.yaml --output-dir subgraphs/$SUBGRAPH_NAME/types",
-    "build": "graph build subgraphs/$SUBGRAPH_NAME/src/subgraph.yaml --output-dir subgraphs/$SUBGRAPH_NAME/build",
+    "generate-abi": "solcjs node_modules/@api3/airnode-protocol-v1/contracts/$AIRNODE_CONTRACT_PATH --abi --include-path node_modules/ --base-path . --output-dir subgraphs/$SUBGRAPH_PATH/abis",
+    "generate-types": "graph codegen subgraphs/$SUBGRAPH_PATH/src/subgraph.yaml --output-dir subgraphs/$SUBGRAPH_PATH/types",
+    "build": "graph build subgraphs/$SUBGRAPH_PATH/src/subgraph.yaml --output-dir subgraphs/$SUBGRAPH_PATH/build",
     "register": "graph create $SUBGRAPH_NAME --node $GRAPH_NODE",
-    "deploy": "graph deploy $SUBGRAPH_NAME subgraphs/$SUBGRAPH_NAME/src/subgraph.yaml --ipfs $IPFS_NODE --node $GRAPH_NODE --version-label $VERSION_LABEL --output-dir subgraphs/$SUBGRAPH_NAME/build",
-    "api3-server-v1:generate-abis": "SUBGRAPH_NAME=api3-server-v1 AIRNODE_CONTRACT_PATH=api3-server-v1/Api3ServerV1.sol yarn generate-abis",
-    "api3-server-v1:generate-types": "SUBGRAPH_NAME=api3-server-v1 yarn generate-types",
-    "api3-server-v1:build": "SUBGRAPH_NAME=api3-server-v1 yarn build",
-    "api3-server-v1:register": "SUBGRAPH_NAME=api3-server-v1 yarn register",
-    "api3-server-v1:deploy": "SUBGRAPH_NAME=api3-server-v1 yarn deploy"
+    "unregister": "graph remove $SUBGRAPH_NAME --node $GRAPH_NODE",
+    "deploy": "graph deploy $SUBGRAPH_NAME subgraphs/$SUBGRAPH_PATH/src/subgraph.yaml --ipfs $IPFS_NODE --node $GRAPH_NODE --version-label $VERSION_LABEL --output-dir subgraphs/$SUBGRAPH_PATH/build",
+    "api3-events:generate-abis": "cross-env SUBGRAPH_PATH=api3-events AIRNODE_CONTRACT_PATH=api3-server-v1/Api3ServerV1.sol yarn generate-abi & cross-env SUBGRAPH_PATH=api3-events AIRNODE_CONTRACT_PATH=utils/PrepaymentDepository.sol yarn generate-abi",
+    "api3-events:generate-types": "cross-env SUBGRAPH_PATH=api3-events yarn generate-types",
+    "api3-events:build": "cross-env SUBGRAPH_PATH=api3-events yarn build",
+    "api3-events:register": "yarn register",
+    "api3-events:deploy": "cross-env SUBGRAPH_PATH=api3-events yarn deploy"
   },
   "dependencies": {
     "@api3/airnode-protocol-v1": "2.7.1",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^20.3.1",
+    "cross-env": "^7.0.3",
     "matchstick-as": "0.5.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
