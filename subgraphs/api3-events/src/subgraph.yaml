@@ -56,11 +56,15 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Deposited
+        - Withdrew
       abis:
         - name: PrepaymentDepository
           file: ../abis/node_modules_@api3_airnode-protocol-v1_contracts_utils_PrepaymentDepository_sol_PrepaymentDepository.abi
       eventHandlers:
         - event: Deposited(indexed address,uint256,uint256,address)
           handler: handleDeposited
+          receipt: true
+        - event: Withdrew(indexed address,indexed bytes32,uint256,uint256,address,address,uint256)
+          handler: handleWithdrew
           receipt: true
       file: ./prepayment-depository.mapping.ts
