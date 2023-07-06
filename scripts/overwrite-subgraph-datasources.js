@@ -1,8 +1,8 @@
 const yaml = require("js-yaml");
 const fs = require("fs");
 
-const subgraphPath = process.env.SUBGRAPH_PATH;
-if (!subgraphPath) throw new Error("SUBGRAPH_PATH env var is required");
+const subgraphPath = process.env.CONTRACT_NAME;
+if (!subgraphPath) throw new Error("CONTRACT_NAME env var is required");
 const networkName = process.env.NETWORK_NAME;
 if (!networkName) throw new Error("NETWORK_NAME env var is required");
 const dataSourcesJson = process.env.DATA_SOURCES;
