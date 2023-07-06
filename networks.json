@@ -1,7 +1,6 @@
 {
   "mumbai": {
     "Api3ServerV1": {
-      "network": "mumbai",
       "address": "0x3dEC619dc529363767dEe9E71d8dD1A5bc270D76",
       "startBlock": 35270000
     }
