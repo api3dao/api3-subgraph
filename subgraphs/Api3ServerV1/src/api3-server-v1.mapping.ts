@@ -26,6 +26,8 @@ import {
   crypto,
 } from "@graphprotocol/graph-ts";
 
+// utils
+
 export function generateLogId(
   transactionHash: Bytes,
   logIndex: BigInt
@@ -99,6 +101,8 @@ export function createLogEntity(
   entity.transactionReceipt = transactionHash;
   entity.save();
 }
+
+// handlers
 
 export function handleSetDapiName(event: SetDapiNameEvent): void {
   let entity = new SetDapiName(event.transaction.hash.toHex());

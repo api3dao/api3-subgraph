@@ -35,9 +35,13 @@ type Log @entity {
 
 type Deposit @entity(immutable: true) {
   id: ID!
-  transactionHash: Bytes!
+  transaction: Transaction!
+  transactionReceipt: TransactionReceipt
   logIndex: BigInt!
+  logType: String
   blockNumber: BigInt!
+  blockTimestamp: BigInt!
+
   user: Bytes!
   amount: BigInt!
   withdrawalLimit: BigInt!
@@ -46,9 +50,13 @@ type Deposit @entity(immutable: true) {
 
 type Withdraw @entity(immutable: true) {
   id: ID!
-  transactionHash: Bytes!
+  transaction: Transaction!
+  transactionReceipt: TransactionReceipt
   logIndex: BigInt!
+  logType: String
   blockNumber: BigInt!
+  blockTimestamp: BigInt!
+
   user: Bytes!
   amount: BigInt!
   expirationTimestamp: BigInt!
