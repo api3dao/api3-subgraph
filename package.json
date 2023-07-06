@@ -4,6 +4,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "postinstall": "yarn api3-server-v1:generate-abis && yarn prepayment-depository:generate-abis",
     "generate-abi": "solcjs node_modules/@api3/airnode-protocol-v1/contracts/$AIRNODE_CONTRACT_PATH --abi --include-path node_modules/ --base-path . --output-dir subgraphs/$SUBGRAPH_PATH/abis",
     "api3-server-v1:generate-abis": "cross-env SUBGRAPH_PATH=api3-server-v1 AIRNODE_CONTRACT_PATH=api3-server-v1/Api3ServerV1.sol yarn generate-abi",
     "prepayment-depository:generate-abis": "cross-env SUBGRAPH_PATH=prepayment-depository AIRNODE_CONTRACT_PATH=utils/PrepaymentDepository.sol yarn generate-abi",
