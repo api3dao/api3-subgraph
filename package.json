@@ -17,7 +17,7 @@
     "deploy:fresh": "yarn overwrite-subgraph-datasources && yarn generate-types && yarn build && yarn register && yarn deploy"
   },
   "bin": {
-    "deploy-subgraph": "./scripts/deploy-subgraph.sh"
+    "deploy-subgraph": "./scripts/deploy.bin.sh"
   },
   "dependencies": {
     "@api3/airnode-protocol-v1": "2.7.1",
