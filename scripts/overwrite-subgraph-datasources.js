@@ -1,40 +1,35 @@
 const yaml = require("js-yaml");
 const fs = require("fs");
 
-const subgraphName = process.env.SUBGRAPH_NAME;
-if (!subgraphName) throw new Error("SUBGRAPH_NAME env var is required");
+const subgraphPath = process.env.SUBGRAPH_PATH;
+if (!subgraphPath) throw new Error("SUBGRAPH_PATH env var is required");
 const networkName = process.env.NETWORK_NAME;
 if (!networkName) throw new Error("NETWORK_NAME env var is required");
+const dataSourcesJson = process.env.DATA_SOURCES;
+if (!dataSourcesJson) throw new Error("DATA_SOURCES env var is required");
+const newDataSources = JSON.parse(dataSourcesJson);
 
 const subgraph = yaml.load(
   fs.readFileSync(
-    __dirname + `/../subgraphs/${subgraphName}/src/subgraph.yaml`,
+    __dirname + `/../subgraphs/${subgraphPath}/src/subgraph.yaml`,
     "utf8"
   )
 );
-
-const dataSources = JSON.parse(
-  fs.readFileSync(
-    __dirname + `/../subgraphs/${subgraphName}/data-sources.json`,
-    "utf8"
-  )
-);
-dataSourceOverwrite = dataSources[networkName];
 
 subgraph.dataSources.forEach((dataSourceInSubgraph) => {
-  if (dataSourceOverwrite[dataSourceInSubgraph.name]) {
-    // if we have a matching data source in the data-sources.json, overwrite it in the subgraph.yaml
-    const overwrite = dataSourceOverwrite[dataSourceInSubgraph.name];
-    if (overwrite.network) dataSourceInSubgraph.network = overwrite.network;
-    if (overwrite.address)
-      dataSourceInSubgraph.source.address = overwrite.address;
-    if (overwrite.startBlock)
-      dataSourceInSubgraph.source.startBlock = overwrite.startBlock;
+  if (newDataSources[dataSourceInSubgraph.name]) {
+    // if we have a matching data source in the networks.json, overwrite it in the subgraph.yaml
+    const newDataSource = newDataSources[dataSourceInSubgraph.name];
+    dataSourceInSubgraph.network = networkName;
+    if (newDataSource.address)
+      dataSourceInSubgraph.source.address = newDataSource.address;
+    if (newDataSource.startBlock)
+      dataSourceInSubgraph.source.startBlock = newDataSource.startBlock;
   }
 });
 
 // write the updated subgraph.yaml
 fs.writeFileSync(
-  __dirname + `/../subgraphs/${subgraphName}/src/subgraph.yaml`,
+  __dirname + `/../subgraphs/${subgraphPath}/src/subgraph.yaml`,
   yaml.dump(subgraph)
 );
