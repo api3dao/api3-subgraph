@@ -2,7 +2,7 @@ version: "3"
 name: "graph"
 services:
   graph-node:
-    image: graphprotocol/graph-node
+    image: graphprotocol/graph-node:v0.31.0
     ports:
       - "${GRAPHQL_HTTP_PORT}:8000" # GraphQL HTTP server
       - "${GRAPHQL_WEBSOCKET_PORT}:8001" # GraphQL WebSocker server
@@ -27,7 +27,7 @@ services:
     ports:
       - "${IPFS_API_PORT}:5001" # IPFS API server
   postgres:
-    image: postgres
+    image: postgres:13.11-bullseye
     ports:
       - "${POSTGRESQL_PORT}:5432" # PostgreSQL server
     command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
