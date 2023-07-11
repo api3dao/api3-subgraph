@@ -16,7 +16,7 @@
 ## Deploy on production:
 
 ```bash
-./scripts/deploy.sh --chain-name ${chain_name} --contract-name ${contract_name}
+./scripts/deploy-public-chain.sh --chain-name ${chain_name} --contract-name ${contract_name}
 ```
 
 Currently supported chains:

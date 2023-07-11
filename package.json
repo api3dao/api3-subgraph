@@ -14,12 +14,12 @@
     "register": "graph create $SUBGRAPH_NAME --node $GRAPH_NODE",
     "unregister": "graph remove $SUBGRAPH_NAME --node $GRAPH_NODE",
     "deploy": "graph deploy $SUBGRAPH_NAME subgraphs/$CONTRACT_NAME/src/subgraph.yaml --ipfs $IPFS_NODE --node $GRAPH_NODE --version-label $VERSION_LABEL --output-dir subgraphs/$CONTRACT_NAME/build",
-    "deploy:fresh": "yarn overwrite-subgraph-datasources && yarn generate-types && yarn build && yarn register && yarn deploy",
-    "compose-local-graph": "docker-compose -f docker-compose.local.yml up"
+    "compose-local-graph-node": "docker-compose -f docker-compose.local.yml up",
+    "generate-build-deploy": "yarn overwrite-subgraph-datasources && yarn generate-types && yarn build && yarn register && yarn deploy"
   },
   "bin": {
-    "compose-local-graph": "./scripts/compose-local-graph.sh",
-    "deploy-subgraph": "./scripts/deploy-fresh-subgraph.sh"
+    "compose-local-graph-node": "./scripts/compose-local-graph-node.sh",
+    "generate-build-deploy-subgraph": "./scripts/generate-build-deploy.sh"
   },
   "dependencies": {
     "@api3/airnode-protocol-v1": "2.7.1",
