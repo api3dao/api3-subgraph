@@ -27,7 +27,7 @@ done
 # Check that both arguments were provided
 if [ -z "$CONTRACT_NAME" ] || [ -z "$CHAIN_NAME" ]
 then
-    echo "Usage: $0 --contractName [name] --chainName [name]"
+    echo "Usage: $0 --contract-name [name] --chain-name [name]"
     exit 1
 fi
 
@@ -47,36 +47,56 @@ fi
 echo "Contract name: $CONTRACT_NAME"
 echo "Chain name: $CHAIN_NAME"
 
-for chain in $(yq eval -o=j subgraph_infrastructure.yaml | jq -cr '.chains[]'); do
-  for node in $(echo $chain | jq -cr '.nodes[]' -); do
-    address=$(echo $node | jq -r '.address' -)
-    graphql_port=$(echo $node | jq -r '.ports.graphql' -)
-    status_port=$(echo $node | jq -r '.ports.status' -)
-    ipfs_port=$(echo $node | jq -r '.ports.ipfs' -)
-    
-    for contract in $(yq eval -o=j subgraph_infrastructure.yaml | jq -cr '.contracts[]'); do
-      export SUBGRAPH_FILE="subgraph.${CHAIN_NAME}.yaml"
-      export SUBGRAPH_NAME="$CHAIN_NAME/$contract"
-      export SUBGRAPH_NODE="http://$address:$graphql_port"
-      export IPFS_NODE="http://$address:$ipfs_port"
+# load contract addresses and deployment block numbers from airnode-protocol-v1 repo
+references=$(yq eval -o=j ./node_modules/@api3/airnode-protocol-v1/deployments/references.json);
+blockNumbers=$(yq eval -o=j ./node_modules/@api3/airnode-protocol-v1/deployments/deployment-block-numbers.json);
+chainIds=$(echo $references | jq -r '.chainNames' | jq 'to_entries | map({(.value): .key}) | add')
 
-      yarn workspace $contract codegen
-      yarn workspace $contract build
+# get contract address and block number for selected contract in selected chain
+chainId=$(echo $chainIds | jq -r --arg chainName "$CHAIN_NAME" '.[$chainName]')
+contractAddress=$(echo $references | jq -cr --arg contractName "$CONTRACT_NAME" --arg chainId "$chainId" '.[$contractName][$chainId]')
+contractBlockNumber=$(echo $blockNumbers | jq -cr --arg contractName "$CONTRACT_NAME" --arg chainId "$chainId" '.[$contractName][$chainId]')
+if [ "$contractAddress" = "null" ] || [ "$contractBlockNumber" = "null" ]; then
+    echo "Error: contract deployment not found for contract '$CONTRACT_NAME' in chain '$CHAIN_NAME'."
+    exit 1
+fi
 
-      response=$(curl -sS --location "http://$address:$status_port/graphql" \
-        --header 'Content-Type: application/json' \
-        --data '{"query": "{ indexingStatusForCurrentVersion(subgraphName: \"'$CHAIN_NAME'/'$contract'\") { synced, health }}"}')
-      if [ "$(echo $response | jq -r '.data.indexingStatusForCurrentVersion')" = "null" ]; then
-        echo "Subgraph $CHAIN_NAME/$contract is not deployed"
-        yarn run graph create $SUBGRAPH_NAME --node $SUBGRAPH_NODE
-        VERSION_LABEL="1.0.0" yarn workspace $contract deploy
-      else
-        echo "Subgraph $CHAIN_NAME/$contract is deployed"
-      fi
-      #yarn workspace $contract deploy
-    done
-  done
+echo "Deployed contract address: $contractAddress"
+echo "Contract deployment block number: $contractBlockNumber"
+
+# load node address, ports from subgraph_infrastructure.yaml
+infrastructure=$(yq eval -o=j subgraph_infrastructure.yaml | jq -cr --arg chainName "$CHAIN_NAME" '.chains[$chainName]')
+if [ "$infrastructure" = "null" ]; then
+    echo "Error: cannot find infrastructure for chain '$CHAIN_NAME'."
+    exit 1
+fi
+
+for node in $(echo $infrastructure | jq -cr '.nodes[]' -); do
+  address=$(echo $node | jq -r '.address' -)
+  graphql_port=$(echo $node | jq -r '.ports.graphql' -)
+  status_port=$(echo $node | jq -r '.ports.status' -)
+  ipfs_port=$(echo $node | jq -r '.ports.ipfs' -)
+  
+  export CONTRACT_NAME=$CONTRACT_NAME
+  export NETWORK_NAME=$CHAIN_NAME
+  export SUBGRAPH_FILE="subgraphs/$CONTRACT_NAME/src/subgraph.yaml"
+  export SUBGRAPH_NAME="$CHAIN_NAME/$CONTRACT_NAME"
+  export GRAPH_NODE="http://$address:$graphql_port"
+  export IPFS_NODE="http://$address:$ipfs_port"
+  export DATA_SOURCES='{"'${CONTRACT_NAME}'": {"address": "'$contractAddress'", "startBlock": '$contractBlockNumber'}}'
+
+  yarn overwrite-subgraph-datasources
+  yarn generate-types
+  yarn build
+
+  response=$(curl -sS --location "http://$address:$status_port/graphql" \
+    --header 'Content-Type: application/json' \
+    --data '{"query": "{ indexingStatusForCurrentVersion(subgraphName: \"'$SUBGRAPH_NAME'\") { synced, health }}"}')
+  if [ "$(echo $response | jq -r '.data.indexingStatusForCurrentVersion')" = "null" ]; then
+    echo "Subgraph $SUBGRAPH_NAME is not deployed."
+    yarn run register
+    VERSION_LABEL="1.0.0" yarn deploy
+  else
+    echo "Subgraph $SUBGRAPH_NAME is already deployed. Skipping deployment."
+  fi
 done
-
-# Add your script logic here
-#SUBGRAPH_FILE="subgraph.$CHAIN_NAME.yaml" yarn workspace $CONTRACT_NAME codegen
