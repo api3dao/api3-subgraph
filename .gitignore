@@ -2,6 +2,7 @@
 subgraphs/*/abis
 subgraphs/*/build
 subgraphs/*/types
+subgraphs/*/src/subgraph.*.yaml
 
 # TypeScript
 *.tsbuildinfo
