@@ -36,9 +36,7 @@ if (CHAINS_JSON) {
     )
   );
   if (!references[CONTRACT_NAME] || !blocNumbers[CONTRACT_NAME]) {
-    throw new Error(
-      `contract deployment not found for contract '${CONTRACT_NAME}'.`
-    );
+    throw new Error(`contract deployment not found for '${CONTRACT_NAME}'.`);
   }
   const chainIds = Object.fromEntries(
     Object.entries(references.chainNames).map((chainEntry) =>
@@ -54,9 +52,10 @@ if (CHAINS_JSON) {
       !references[CONTRACT_NAME][chainId] ||
       !blocNumbers[CONTRACT_NAME][chainId]
     ) {
-      throw new Error(
-        `contract deployment not found for contract '${CONTRACT_NAME}' in chain '${chainName}'.`
+      console.info(
+        `contract deployment not found for '${CONTRACT_NAME}' in chain '${chainName}'.`
       );
+      return;
     }
     chains.push({
       network: chainName,
