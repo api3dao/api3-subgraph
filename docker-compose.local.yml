@@ -1,0 +1,42 @@
+version: "3"
+name: "graph"
+services:
+  graph-node:
+    image: graphprotocol/graph-node:v0.31.0
+    ports:
+      - "${GRAPHQL_HTTP_PORT}:8000" # GraphQL HTTP server
+      - "${GRAPHQL_WEBSOCKET_PORT}:8001" # GraphQL WebSocker server
+      - "${JSON_RPC_PORT}:8020" # JSON-RPC admin server
+      - "${INDEX_PORT}:8030" # index node server
+      - "${METRICS_PORT}:8040" # metrics
+    depends_on:
+      - ipfs-node
+      - postgres
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      postgres_host: postgres
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+      ipfs: "ipfs-node:5001"
+      ethereum: ${NETWORK_URLS}
+      GRAPH_LOG: info
+  ipfs-node:
+    image: ipfs/go-ipfs:v0.10.0
+    ports:
+      - "${IPFS_API_PORT}:5001" # IPFS API server
+  postgres:
+    image: postgres:13.11-bullseye
+    ports:
+      - "${POSTGRESQL_PORT}:5432" # PostgreSQL server
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: graph-node
+      # FIXME: remove this env. var. which we shouldn't need. Introduced by
+      # <https://github.com/graphprotocol/graph-node/pull/3511>, maybe as a
+      # workaround for https://github.com/docker/for-mac/issues/6270?
+      PGDATA: "/var/lib/postgresql/data"
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"

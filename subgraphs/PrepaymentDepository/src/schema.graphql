@@ -1,0 +1,67 @@
+type Transaction @entity(immutable: true) {
+  id: Bytes!
+  hash: Bytes!
+  index: BigInt!
+  from: Bytes!
+  to: Bytes
+  value: BigInt!
+  gasLimit: BigInt!
+  gasPrice: BigInt!
+  input: Bytes!
+  nonce: BigInt!
+}
+
+type TransactionReceipt @entity(immutable: true) {
+  id: Bytes!
+  blockHash: Bytes!
+  blockNumber: BigInt!
+  cumulativeGasUsed: BigInt
+  gasUsed: BigInt!
+  contractAddress: Bytes
+  status: BigInt
+  root: Bytes
+  logsBloom: Bytes
+  logs: [Log!]! @derivedFrom(field: "transactionReceipt")
+}
+
+type Log @entity {
+  id: ID!
+  logIndex: BigInt!
+  data: Bytes!
+  topics: [Bytes!]
+  removed: Boolean @nullable
+  transactionReceipt: TransactionReceipt!
+}
+
+type Deposit @entity(immutable: true) {
+  id: ID!
+  transaction: Transaction!
+  transactionReceipt: TransactionReceipt
+  logIndex: BigInt!
+  logType: String
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+
+  user: Bytes!
+  amount: BigInt!
+  withdrawalLimit: BigInt!
+  sender: Bytes!
+}
+
+type Withdraw @entity(immutable: true) {
+  id: ID!
+  transaction: Transaction!
+  transactionReceipt: TransactionReceipt
+  logIndex: BigInt!
+  logType: String
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+
+  user: Bytes!
+  amount: BigInt!
+  expirationTimestamp: BigInt!
+  withdrawalHash: Bytes!
+  withdrawalSigner: Bytes!
+  withdrawalDestination: Bytes!
+  withdrawalLimit: BigInt!
+}

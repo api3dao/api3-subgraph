@@ -1,3 +1,9 @@
+# auto-generated files
+subgraphs/*/abis
+subgraphs/*/build
+subgraphs/*/types
+subgraphs/*/src/subgraph.*.yaml
+
 # TypeScript
 *.tsbuildinfo
 node_modules/
@@ -7,6 +13,7 @@ dist/
 __pycache__/
 
 # IDE files
+.history/
 .vscode/
 .idea/
 *.sublime-project
@@ -27,3 +34,6 @@ yarn-error.log*
 # Custom
 keys
 subgraph_infrastructure.yaml
+
+# Evnironment variables
+.env
