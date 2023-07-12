@@ -8,14 +8,14 @@
     "generate-abi": "solcjs node_modules/@api3/airnode-protocol-v1/contracts/$AIRNODE_CONTRACT_PATH --abi --include-path node_modules/ --base-path . --output-dir subgraphs/$CONTRACT_NAME/abis",
     "api3-server-v1:generate-abis": "cross-env CONTRACT_NAME=Api3ServerV1 AIRNODE_CONTRACT_PATH=api3-server-v1/Api3ServerV1.sol yarn generate-abi",
     "prepayment-depository:generate-abis": "cross-env CONTRACT_NAME=PrepaymentDepository AIRNODE_CONTRACT_PATH=utils/PrepaymentDepository.sol yarn generate-abi",
-    "generate-chain-specific-configs": "node ./scripts/generate-chain-specific-configs.js",
     "generate-types": "graph codegen subgraphs/$CONTRACT_NAME/src/subgraph.yaml --output-dir subgraphs/$CONTRACT_NAME/types",
+    "generate-chain-specific-configs": "node ./scripts/generate-chain-specific-configs.js",
     "build": "graph build subgraphs/$CONTRACT_NAME/src/subgraph.$CHAIN_NAME.yaml --output-dir subgraphs/$CONTRACT_NAME/build/$CHAIN_NAME",
     "register": "graph create $SUBGRAPH_NAME --node $GRAPH_NODE",
     "unregister": "graph remove $SUBGRAPH_NAME --node $GRAPH_NODE",
     "deploy": "graph deploy $SUBGRAPH_NAME subgraphs/$CONTRACT_NAME/src/subgraph.$CHAIN_NAME.yaml --ipfs $IPFS_NODE --node $GRAPH_NODE --version-label $VERSION_LABEL --output-dir subgraphs/$CONTRACT_NAME/build/$CHAIN_NAME",
     "compose-local-graph-node": "docker-compose -f docker-compose.local.yml up",
-    "generate-build-deploy": "yarn generate-chain-specific-configs && yarn generate-types && yarn build && yarn register && yarn deploy"
+    "generate-build-deploy": "yarn generate-types && yarn generate-chain-specific-configs && yarn build && yarn register && yarn deploy"
   },
   "bin": {
     "compose-local-graph-node": "./scripts/compose-local-graph-node.sh",
