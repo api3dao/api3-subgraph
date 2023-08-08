@@ -7,20 +7,25 @@ do
 
     case $key in
         --contract-name)
-        CONTRACT_NAME="$2"
-        shift # past argument
-        shift # past value
-        ;;
+          CONTRACT_NAME="$2"
+          shift # past argument
+          shift # past value
+          ;;
         --chain-name)
-        CHAIN_NAME="$2"
-        shift # past argument
-        shift # past value
-        ;;
+          CHAIN_NAME="$2"
+          shift # past argument
+          shift # past value
+          ;;
+        --region)
+          region="$2"
+          shift # past argument
+          shift # past value
+          ;;
         *)
-        # unknown option
-        echo "Unknown option: $key"
-        exit 1
-        ;;
+          # unknown option
+          echo "Unknown option: $key"
+          exit 1
+          ;;
     esac
 done
 
@@ -47,38 +52,45 @@ fi
 echo "Contract name: $CONTRACT_NAME"
 echo "Chain name: $CHAIN_NAME"
 
-# load node address, ports from subgraph_infrastructure.yaml
-infrastructure=$(yq eval -o=j subgraph_infrastructure.yaml | jq -cr --arg chainName "$CHAIN_NAME" '.chains[$chainName]')
-if [ "$infrastructure" = "null" ]; then
-    echo "Error: cannot find infrastructure for chain '$CHAIN_NAME'."
-    exit 1
-fi
+region=${region:-us-east-1}
+graphql_port=8020
+status_port=8030
+ipfs_port=5001
 
-for node in $(echo $infrastructure | jq -cr '.nodes[]' -); do
-  address=$(echo $node | jq -r '.address' -)
-  graphql_port=$(echo $node | jq -r '.ports.graphql' -)
-  status_port=$(echo $node | jq -r '.ports.status' -)
-  ipfs_port=$(echo $node | jq -r '.ports.ipfs' -)
-  
+# List EC2 instances matching the name pattern
+instances=$(aws ec2 describe-instances --region "$region" --filters "Name=tag:Name,Values=dapis-*-subgraph-*" "Name=instance-state-name,Values=running" --query 'Reservations[].Instances[].{Name:Tags[?Key==`Name`].Value | [0], PublicIP:PublicIpAddress}' --output json)
+
+echo $instances | jq -c '.[]' | while read instance; do
+  instance_name=$(jq -r '.Name' <<< "$instance")
+  instance_ip=$(jq -r '.PublicIP' <<< "$instance")
+  chain=$(sed -n 's/.*dapis-[^-]*-\(.*\)-subgraph-.*/\1/p' <<< "$instance_name")
+
+  if [ "$chain" != "$CHAIN_NAME" ]; then
+    continue
+  fi  
+
   export CONTRACT_NAME=$CONTRACT_NAME
   export CHAIN_NAME=$CHAIN_NAME
   export SUBGRAPH_FILE="subgraphs/$CONTRACT_NAME/src/subgraph.yaml"
   export SUBGRAPH_NAME="$CHAIN_NAME/$CONTRACT_NAME"
-  export GRAPH_NODE="http://$address:$graphql_port"
-  export IPFS_NODE="http://$address:$ipfs_port"
+  export GRAPH_NODE="http://$instance_ip:$graphql_port"
+  export IPFS_NODE="http://$instance_ip:$ipfs_port"
 
   yarn generate-chain-specific-configs
   yarn generate-types
   yarn build
 
-  response=$(curl -sS --location "http://$address:$status_port/graphql" \
+  echo "Checking if subgraph $SUBGRAPH_NAME is already deployed on node $instance_name..."
+  response=$(curl -sS --connect-timeout 10 --location "http://$instance_ip:$status_port/graphql" \
     --header 'Content-Type: application/json' \
-    --data '{"query": "{ indexingStatusForCurrentVersion(subgraphName: \"'$SUBGRAPH_NAME'\") { synced, health }}"}')
+    --data '{"query": "{ indexingStatusForCurrentVersion(subgraphName: \"'$SUBGRAPH_NAME'\") { synced }}"}' 2>&1)
   if [ "$(echo $response | jq -r '.data.indexingStatusForCurrentVersion')" = "null" ]; then
-    echo "Subgraph $SUBGRAPH_NAME is not deployed."
+    echo "Subgraph $SUBGRAPH_NAME is not deployed on $instance_name."
     yarn run register
     VERSION_LABEL="1.0.0" yarn deploy
-  else
+  elif [[ "$(echo $response | jq -cr '.data.indexingStatusForCurrentVersion' -)" == *"synced"* ]]; then
     echo "Subgraph $SUBGRAPH_NAME is already deployed. Skipping deployment."
+  else
+    echo "Error: cannot check if subgraph $SUBGRAPH_NAME is deployed."
   fi
 done

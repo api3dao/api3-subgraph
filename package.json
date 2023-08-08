@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@api3/airnode-protocol-v1": "2.7.1",
-    "@graphprotocol/graph-cli": "^0.51.2",
+    "@graphprotocol/graph-cli": "^0.52.0",
     "@graphprotocol/graph-ts": "0.29.3",
     "cross-env": "^7.0.3",
     "js-yaml": "^4.1.0",

@@ -2,6 +2,7 @@ const yaml = require("js-yaml");
 const fs = require("fs");
 
 const CONTRACT_NAME = process.env.CONTRACT_NAME;
+const START_BLOCK = process.env.START_BLOCK;
 if (!CONTRACT_NAME) throw new Error("CONTRACT_NAME env var is required");
 let CHAINS_JSON = process.env.CHAINS;
 
@@ -18,7 +19,7 @@ if (CHAINS_JSON) {
   const infrastructure = yaml.load(
     fs.readFileSync(__dirname + `/../subgraph_infrastructure.yaml`, "utf8")
   );
-  const chainNames = Object.keys(infrastructure.chains);
+  const chainNames = infrastructure.chains;
 
   // load contract addresses and deployment block numbers from airnode-protocol-v1 repo
   const references = JSON.parse(
@@ -95,7 +96,7 @@ chains.forEach((chain) => {
   contractDataSource.network = chain.network;
   contractDataSource.source.address = chain.sources[CONTRACT_NAME].address;
   contractDataSource.source.startBlock =
-    chain.sources[CONTRACT_NAME].startBlock;
+    Number(chain.sources[CONTRACT_NAME].startBlock);
 
   // write the chain-specific subgraph.${chain}.yaml
   fs.writeFileSync(
