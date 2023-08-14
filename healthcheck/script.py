@@ -4,6 +4,13 @@ from flask import Flask, jsonify, make_response, request
 
 app = Flask(__name__)
 
+def get_chain_data(chains, chain_name):
+    result = None
+    for chain in chains:
+        if chain['network'] == chain_name:
+            result = chain
+            break
+    return result
 
 @app.route('/healthz')
 def hello():
@@ -21,7 +28,10 @@ def hello():
     try:
         if status.status_code == 200:
             body = status.json()['data']['indexingStatusForCurrentVersion']
-            if body['synced']:
+            chain_block_data = get_chain_data(body['chains'], chain)
+            chain_head_block = chain_block_data['chainHeadBlock']['number']
+            latest_block = chain_block_data['latestBlock']['number']
+            if body['synced'] and body['health'] == 'healthy' and chain_head_block == latest_block:
                 response = {'code': 200 }
             response = response | body
     except:
