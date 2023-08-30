@@ -33,7 +33,8 @@
 ## Deploy on production:
 
 1. install dependencies `yarn install`
-2. run the deployment script
+2. export AWS credentials
+3. run the deployment script
    ```bash
    ./scripts/deploy-public-chain.sh --chain-name ${chain_name} --contract-name ${contract_name}
    ```
@@ -41,3 +42,5 @@
 Currently supported chains:
 
 - `Polygon Mumbai` (id: polygon-testnet)
+- `Polygon zkevm` (id: polygon-zkevm)
+- `Arbitrum` (id: arbitrum)
