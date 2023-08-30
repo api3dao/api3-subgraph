@@ -29,9 +29,9 @@ def hello():
         if status.status_code == 200:
             body = status.json()['data']['indexingStatusForCurrentVersion']
             chain_block_data = get_chain_data(body['chains'], chain)
-            chain_head_block = chain_block_data['chainHeadBlock']['number']
-            latest_block = chain_block_data['latestBlock']['number']
-            if body['synced'] and body['health'] == 'healthy' and chain_head_block == latest_block:
+            chain_head_block = int(chain_block_data['chainHeadBlock']['number'])
+            latest_block = int(chain_block_data['latestBlock']['number'])
+            if body['synced'] and body['health'] == 'healthy' and chain_head_block < latest_block + 20: # 20 blocks behind is acceptable
                 response = {'code': 200 }
             response = response | body
     except:
