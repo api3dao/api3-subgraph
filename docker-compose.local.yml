@@ -1,5 +1,4 @@
 version: "3"
-name: "graph"
 services:
   graph-node:
     image: graphprotocol/graph-node:v0.31.0
